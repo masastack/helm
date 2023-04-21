@@ -1,0 +1,49 @@
+kind: Component
+apiVersion: dapr.io/v1alpha1
+metadata:
+  name: localsecretstore
+spec:
+  type: secretstores.kubernetes
+  version: v1
+  metadata:
+    - name: ''
+---
+kind: Component
+apiVersion: dapr.io/v1alpha1
+metadata:
+  name: statestore
+spec:
+  type: state.redis
+  version: v1
+  ignoreErrors: false
+  metadata:
+    - name: redisHost
+      value: {{ .Values.global.redis.ip |default "middleware-redis"}}:{{ .Values.global.redis.port |default 6379}}
+    - name: redisPassword
+      value: {{ .Values.global.redis.password |default "p@ssw0rd"}}
+    - name: actorStateStore
+      value: true
+    - name: redisDB
+      value: {{ .Values.global.redis.db |default 0 }}
+auth:
+  secretStore: ''
+---
+kind: Component
+apiVersion: dapr.io/v1alpha1
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.redis
+  version: v1
+  ignoreErrors: false
+  metadata:
+    - name: redisHost
+      value: {{ .Values.global.redis.ip |default "middleware-redis"}}:{{ .Values.global.redis.port |default 6379}}
+    - name: redisPassword
+      value: {{ .Values.global.redis.password |default "p@ssw0rd"}}
+    - name: redisDB
+      value: {{ .Values.global.redis.db |default 0 }}
+    - name: maxLenApprox
+      value: '100000'
+auth:
+  secretStore: ''

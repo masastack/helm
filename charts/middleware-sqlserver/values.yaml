@@ -1,0 +1,58 @@
+# Default values for middleware_sqlserver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  sqlserver:
+    ip: ""
+    password: "p@ssw0rd"
+
+  volumeclaims:
+    enabled: true
+    storageSize: 4Gi
+    storageClassName: 
+
+replicaCount: 1
+
+image:
+  repository: registry.cn-hangzhou.aliyuncs.com/masastack/sqlserver
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "2019-latest"
+
+password: "p@ssw0rd"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+volumeclaims:
+  enabled: false
+  storageSize: 1Gi
+  storageClassName: 
+
+service:
+  # type: ClusterIP
+  type: NodePort
+  port: 1433
+  nodePort: "30433"
+
+resources:
+  limits:
+    cpu: "2000m"
+    memory: "8Gi"
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

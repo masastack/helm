@@ -1,0 +1,1 @@
+elastic-service: middleware-elastic:9200

@@ -1,0 +1,32 @@
+{{- if eq .Values.global.otel.ip  "" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: middleware-otel
+  labels:
+    {{- include "middleware-otel.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      name: middleware-otel
+{{- if eq .Values.service.type  "NodePort" }}
+{{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+{{- end }}
+{{- end }}
+    - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
+      port: 4317
+      protocol: TCP
+      targetPort: 4317
+    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
+      port: 4318
+      protocol: TCP
+      targetPort: 4318
+    - name: metrics # Default endpoint for querying metrics.
+      port: 8888
+  selector:
+    app: middleware-otel
+{{- end }}

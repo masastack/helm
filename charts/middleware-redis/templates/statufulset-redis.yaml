@@ -1,0 +1,77 @@
+{{- if eq .Values.global.redis.ip  "" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middleware-redis
+  labels:
+    app: middleware-redis
+    {{- include "middleware-redis.labels" . | nindent 4 }}
+spec:
+  serviceName: middleware-redis
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: middleware-redis
+  template:
+    metadata:
+      labels:
+        app: middleware-redis
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: middleware-redis
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        command: 
+          - "sh"
+          - "-c"
+          - "redis-server /usr/local/etc/redis/redis.conf"
+        ports:
+        - containerPort: 6379
+          name: redis
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        livenessProbe:
+          failureThreshold: 3
+          successThreshold: 1
+          initialDelaySeconds: 0
+          timeoutSeconds: 1
+          periodSeconds: 60
+          tcpSocket:
+            port: 6379
+        readinessProbe:
+          failureThreshold: 3
+          successThreshold: 1
+          initialDelaySeconds: 0
+          timeoutSeconds: 1
+          periodSeconds: 10
+          tcpSocket:
+            port: 6379
+        volumeMounts:
+        - name: config
+          mountPath: /usr/local/etc/redis/redis.conf
+          subPath: redis.conf
+        {{- if eq .Values.global.volumeclaims.enabled true }}
+        - name: redis-data
+          mountPath: /data
+        {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: redis-config
+  {{- if eq .Values.global.volumeclaims.enabled true }}
+  volumeClaimTemplates:
+  - metadata:
+      name: redis-data
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: {{ .Values.global.volumeclaims.storageSize }}
+    {{- if .Values.global.volumeclaims.storageClassName }}
+      storageClassName: {{ .Values.global.volumeclaims.storageClassName }}
+    {{- end }}
+  {{- end }}
+{{- end }}

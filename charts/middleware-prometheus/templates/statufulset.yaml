@@ -1,0 +1,65 @@
+{{- if eq .Values.global.prometheus.ip  "" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middleware-prometheus
+  labels:
+    app: middleware-prometheus
+    {{- include "middleware-prometheus.labels" . | nindent 4 }}
+spec:
+  serviceName: middleware-prometheus
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: middleware-prometheus
+  template:
+    metadata:
+      labels:
+        app: middleware-prometheus
+    spec:
+      terminationGracePeriodSeconds: 10
+      securityContext:                                   #指定运行的用户为root
+        runAsUser: 0
+      serviceAccountName: middleware-prometheus
+      containers:
+      - name: middleware-prometheus
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        args:
+        - "--config.file=/etc/prometheus/prometheus.yml" #通过volume挂载prometheus.yml
+        - "--storage.tsdb.path=/prometheus"              #通过vlolume挂载目录/prometheus
+        - "--storage.tsdb.retention.time=24h"
+        - "--web.enable-admin-api"                       #控制对admin HTTP API的访问，其中包括删除时间序列等功能
+        - "--web.enable-lifecycle"                       #支持热更新，直接执行localhost:9090/-/reload立即生效
+        ports:
+        - containerPort: 9090
+          name: prometheus
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        volumeMounts:
+        - mountPath: "/etc/prometheus"
+          name: config-volume
+{{- if eq .Values.global.volumeclaims.enabled true }}
+        - name: prometheusdata
+          mountPath: /prometheus
+{{- end }}
+      volumes:
+      - name: config-volume
+        configMap:
+          name: prometheus-config 
+{{- if eq .Values.global.volumeclaims.enabled true }}
+  volumeClaimTemplates:
+  - metadata:
+      name: prometheusdata
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: {{ .Values.global.volumeclaims.storageSize }}
+    {{- if .Values.global.volumeclaims.storageClassName }}
+      storageClassName: {{ .Values.global.volumeclaims.storageClassName }}
+    {{- end }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,53 @@
+# Default values for middleware_sqlserver.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  elastic: 
+    ip: ""
+    port: ""
+  otel:
+    ip: ""
+
+  # volumeclaims:
+  #   enabled: true
+  #   storageSize: 1Gi
+  #   storageClassName: 
+
+replicaCount: 1
+
+image:
+  repository: registry.cn-hangzhou.aliyuncs.com/masastack/opentelemetry-collector-contrib
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.68.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: NodePort
+  # type: ClusterIP
+  port: 9013
+  nodePort: "30013"
+
+resources:
+  limits:
+    cpu: "2000m"
+    memory: "4Gi"
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

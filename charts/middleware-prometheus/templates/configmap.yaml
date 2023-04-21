@@ -1,0 +1,78 @@
+{{- if eq .Values.global.prometheus.ip  "" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: {{ .Release.Namespace }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      scrape_timeout: 15s
+    scrape_configs:
+    - job_name: 'prometheus'
+      static_configs:
+      - targets: ['localhost:9090']
+    - job_name: 'otel-pods'
+      label_limit: 100
+      label_name_length_limit: 100
+      label_value_length_limit: 2000
+
+      # ask k8s for a list of pods
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      # Pod scraping config comes from annotations on the pod.
+      #  • `prometheus.io/scrape`: Only scrape pods that have a value of `true`
+      #  • `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+      #  • `prometheus.io/port`: If the metrics are exposed on a different port to the
+      #    pod then set this appropriately.
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: otel
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+
+      # Add pod name and namespaces labels to the time series.
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+
+      # Connect team used the "serviceName" label in some dashboards; keep it in case
+      # it's useful elsewhere.
+      - source_labels: [__meta_kubernetes_pod_label_serviceName]
+        action: replace
+        target_label: serviceName
+    - job_name: 'daprd'
+      label_limit: 100
+      label_name_length_limit: 100
+      label_value_length_limit: 2000
+      kubernetes_sd_configs:
+      - role: service
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_namespace]
+        action: keep
+        regex: masastack
+      - source_labels: [__meta_kubernetes_service_name, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+{{- end }}

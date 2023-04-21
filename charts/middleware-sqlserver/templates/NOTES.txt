@@ -1,0 +1,4 @@
+{{- if eq .Values.global.sqlserver.ip  "" -}}
+1.  Get SqlServer Passwd(for linux):
+kubectl --namespace {{ .Release.Namespace }}  get secret  middleware-sqlserver  -o jsonpath={.data.MSSQL_SA_PASSWORD} | base64 --decode
+{{- end }}

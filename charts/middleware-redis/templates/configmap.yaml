@@ -1,0 +1,17 @@
+{{- if eq .Values.global.redis.ip  "" -}}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: redis-config
+  labels:
+    app: middleware-redis
+data:
+  redis.conf: |-
+    dir /data
+    port 6379
+    bind 0.0.0.0
+    appendonly yes
+    protected-mode no
+    requirepass {{ .Values.password }}
+    pidfile /data/redis-6379.pid
+{{- end }}

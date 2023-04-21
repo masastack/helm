@@ -1,0 +1,22 @@
+{{- if eq .Values.global.sqlserver.ip  "" -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: middleware-sqlserver
+  labels:
+    {{- include "middleware-sqlserver.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+      name: middleware-sqlserver
+{{- if eq .Values.service.type  "NodePort" }}
+{{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+{{- end }}
+{{- end }}
+  selector:
+    app: middleware-sqlserver
+{{- end }}
