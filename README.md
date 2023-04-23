@@ -1,19 +1,53 @@
-# 部署demo环境
+# 在kubernetes集群上部署MasaStack服务
 
-## 1. 创建storage class
->  https://kubernetes.io/docs/concepts/storage/storage-classes/
-## 2. 部署dapr  (masastack 的服务不能和dapr在同一个namespace 不然daprd会有注入异常的情况出现)
->  kubectl create ns dapr
->  https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/
-## 3. 创建Masastack 需要的namespace
-> kubectl create masastack
-## 4. 创建tls证书 (如果有默认赠书可以不创建，)
->  参考具体内容[tls_create](./README_TLS.md)
-## 5. 私有镜像仓库设置
-### 1. 创建相关的dockerconfigjson
-> kubectl create secret docker-registry masastack  --docker-server=DOCKER_REGISTRY_SERVER --docker-username=DOCKER_USER --docker-password=DOCKER_PASSWORD  --docker-email=DOCKER_EMAIL
-### 2. 配置引用，需要在values.yaml进行配置
->  global.imagePullSecrets: ["masastack","masastack01"] 
-## 6. 
+## 按照以下步骤在kubernetes上部署MasaStack.
 
+设置kubernetes时，你需要使用到Helm
 
+# 先决条件
+
+* kubernetes集群
+
+* 安装nginx-ingress
+
+* 安装kubectl
+
+* 安装Helm
+
+* 安装Dapr
+
+# 使用Helm安装
+
+您可以使用Helm3 chart在kubernetes上部署MasaStack
+
+## 添加并安装MasaStack Helm Chart
+
+1. 确保您的机器上安装Helm3
+
+2. 添加Helm仓库并更新
+
+```shell
+// 添加helm仓库
+helm  repo add masastack https://masastack.github.io/helm/
+// 或者添加私有仓库
+helm repo add masastack http://helm.custom-domain.com/helm/masastack/ \
+    --username=xxx --password=xxx
+helm repo update masastack 
+
+# see which chart versions are available
+helm search repo masastack --devel --versions
+```
+
+3. 在集群的命名空间中安装MasaStack图标`masasatck`.
+
+```shell
+helm upgrade --install masastack masastack/masastack  --namespace masastack --create-namespace 
+```
+
+*程序启动时间和集群配置相关预计5-10分钟，镜像获取时间和本地带宽有关预计10-15分钟，总耗时15-25分钟就能完成安装*
+
+## 验证安装
+
+安装完成后
+
+> kubectl get pods  --namespace   masastack 
