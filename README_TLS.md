@@ -94,4 +94,5 @@ vbRG7sTyTM2AkQiL0PLWQBBv
 ```
 
 ## 完成证书设置之后通过kubectl的命令来导入证书提供masastack使用
+
 >  kubectl create secret tls masastack --cert=./tls.crt  --key=./tls.key  -n masastack

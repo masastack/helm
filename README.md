@@ -51,3 +51,36 @@ helm upgrade --install masastack masastack/masastack  --namespace masastack --cr
 安装完成后
 
 > kubectl get pods  --namespace   masastack 
+
+## 在kubernetes上卸载MasaStack
+
+> helm uninstall masastack --namespace dapr-system
+
+### 更多信息
+
+#### 证书使用
+
+* 自有通用证书
+
+* 使用自签证书 *参考链接：[生成临时的tls证书提供给ingress使用 | helm](https://masastack.github.io/helm/README_TLS)*
+
+> kubectl create secret tls <tls_name> --cert=./tls.crt --key=./tls.key -n masastack
+> 
+> helm upgrade --install masastack masastack/masastack --namespace  masastack  --create-namespace  --set global.secretName <tls_name> --set global.domain <domain_name>
+
+*注这里的domain_name为你自签证书中的<Common Name>*
+
+* 其他更多的变量参考values.yaml文件
+
+#### 常用变量
+
+| 变量名                                                                   | 备注                                                        |
+| --------------------------------------------------------------------- | --------------------------------------------------------- |
+| global.sqlserver.{ip,id,port,password}                                | 使用外部数据库的时候配置，ip地址，账号，端口和密码                                |
+| global.redis.{ip,db,port,password}                                    | 使用外部redis的配置                                              |
+| global.elastic.{ip,port}                                              | 使用外部elasticsearch的配置                                      |
+| global.prometheus{ip,port}                                            | 使用外部prometheus的配置                                         |
+| global.suffix_identity                                                | <env>配置环境变量，针对本地多环境来使用                                    |
+| global.volumeclaims.{enabled,storageSize,storageClassName}            | 分别是启动StorageClass存储，指定存储空间大小，指定相应的StorageClass，若无指定使用默认sc |
+| middleware-{redis,prometheus,sqlserver,otel,elastic}.service.type     | ClusterIP,NodePort，默认为ClusterIP，主要为服务提供外部方位时修改            |
+| middleware-{redis,prometheus,sqlserver,otel,elastic}.service.nodePort | 例如，32200 ；结合type使用，指定需要的端口                                |
