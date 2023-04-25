@@ -62,7 +62,9 @@ helm upgrade --install masastack masastack/masastack  --namespace masastack --cr
 
 * 自有通用证书
 
-* 使用自签证书 *参考链接：[生成临时的tls证书提供给ingress使用 | helm](https://masastack.github.io/helm/README_TLS)*
+* 使用自签证书
+
+`参考链接`：[生成临时的tls证书提供给ingress使用 | helm](https://masastack.github.io/helm/README_TLS)
 
 > kubectl create secret tls <tls_name> --cert=./tls.crt --key=./tls.key -n masastack
 > 
