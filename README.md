@@ -38,7 +38,7 @@ helm repo update masastack
 helm search repo masastack --devel --versions
 ```
 
-3. 在集群的命名空间中安装MasaStack图标`masasatck`.
+3. 在集群的命名空间`masasatck`中安装MasaStack Charts .
 
 ```shell
 helm upgrade --install masastack masastack/masastack  --namespace masastack --create-namespace 
