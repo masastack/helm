@@ -31,10 +31,10 @@ volumeclaims:
   storageClassName: 
 
 service:
-  # type: ClusterIP
-  type: NodePort
+  type: ClusterIP
+  # type: NodePort
   port: 1433
-  nodePort: "30433"
+  # nodePort: "30433"
 
 resources:
   limits:

@@ -12,7 +12,9 @@ global:
     repository: registry.cn-hangzhou.aliyuncs.com/masastack
     imagePullPolicy: Always
     # imagePullPolicy: IfNotPresent
-    tag: "demo-1.0.0"
+    tag: "demo-1.0.0-rc1"
+
+
 
   ingress:
     secretName: "masastack"
@@ -60,7 +62,7 @@ pm:
       cpu: "200m"
   server:
     replicas: 1
-    name: pm-server
+    name: pm-service
     port: 80
     nodeport: ""
   ui:
@@ -83,7 +85,7 @@ dcc:
       cpu: "200m"
   server:
     replicas: 1
-    name: dcc-server
+    name: dcc-service
     port: 80
     nodeport: ""
   ui:
@@ -106,7 +108,7 @@ auth:
       cpu: "200m"
   server:
     replicas: 1
-    name: auth-server
+    name: auth-service
     port: 80
     nodeport: ""
   ui:
@@ -134,7 +136,7 @@ mc:
       cpu: "200m"
   server:
     replicas: 1
-    name: mc-server
+    name: mc-service
     port: 80
     nodeport: ""
   ui:
@@ -157,7 +159,7 @@ alert:
       cpu: "200m"
   server:
     replicas: 1
-    name: alert-server
+    name: alert-service
     port: 80
     nodeport: ""
   ui:
@@ -180,7 +182,7 @@ tsc:
       cpu: "200m"
   server:
     replicas: 1
-    name: tsc-server
+    name: tsc-service
     port: 80
     nodeport: ""
   ui:
@@ -203,7 +205,7 @@ scheduler:
       cpu: "200m"
   server:
     replicas: 1
-    name: scheduler-server
+    name: scheduler-service
     port: 80
     nodeport: ""
   worker:
@@ -216,3 +218,38 @@ scheduler:
     name: scheduler-ui
     port: 443 
     nodeport: ""
+
+middleware-sqlserver:
+  service:
+    # type: NodePort
+    type: ClusterIP
+    port: 1433
+    # nodePort: "30433"
+
+middleware-redis:
+  service:
+    # type: NodePort
+    type: ClusterIP
+    port: 6379
+    # nodePort: "30079"
+
+middleware-prometheus:
+  service:
+    # type: NodePort
+    type: ClusterIP
+    port: 9090
+    # nodePort: "30090"
+
+middleware-otel:
+  service:
+    # type: NodePort
+    type: ClusterIP
+    port: 9013
+    # nodePort: "30013"
+
+middleware-elastic:
+  service:
+    # type: NodePort
+    type: ClusterIP
+    port: 9200
+    # nodePort: "30200"

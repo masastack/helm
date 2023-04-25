@@ -22,7 +22,7 @@ spec:
       terminationGracePeriodSeconds: 10
       securityContext:                                   #指定运行的用户为root
         runAsUser: 0
-      serviceAccountName: middleware-prometheus
+      serviceAccountName: middleware-prometheus{{- if  .Values.global.suffix_identity }}-{{ .Values.global.suffix_identity }}{{- end }}
       containers:
       - name: middleware-prometheus
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"

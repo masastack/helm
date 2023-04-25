@@ -25,10 +25,18 @@ spec:
   {{- end }}
   tls:
     - hosts: 
+      {{- if .Values.global.suffix_identity }}
+      - {{ .Values.sso.name }}-{{.Values.global.suffix_identity}}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+      {{- else }}
       - {{ .Values.sso.name }}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+      {{- end  }}
       secretName: {{ .Values.global.secretName }}
   rules:
+    {{- if .Values.global.suffix_identity }}
+    - host: {{ .Values.sso.name }}-{{.Values.global.suffix_identity}}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+    {{- else }}
     - host: {{ .Values.sso.name }}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+    {{- end  }}
       http:
         paths:
           - path: /

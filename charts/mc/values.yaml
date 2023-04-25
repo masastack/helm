@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  suffix_identity: ""
   demo: false
   domain: ""
   secretName: ""
@@ -10,7 +11,7 @@ global:
 
 dbName: "mc"
 server:
-  name: mc-server
+  name: mc-service
   replicas: 1
   port: 80
   nodeport: ""

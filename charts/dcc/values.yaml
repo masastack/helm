@@ -2,6 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 global:
+  suffix_identity: ""
   image:
     tag: ""
   demo: false
@@ -12,7 +13,7 @@ global:
 
 dbName: "dcc"
 server:
-  name: dcc-server
+  name: dcc-service
   replicas: 1
   port: 80
   nodeport: ""

@@ -17,7 +17,11 @@ spec:
   template:
     metadata:
       annotations:
+        {{- if .Values.global.suffix_identity }}
+        dapr.io/app-id: {{ .Values.server.name }}-{{ .Values.global.suffix_identity }}
+        {{- else }}
         dapr.io/app-id: {{ .Values.server.name }}
+        {{- end }}
         dapr.io/app-port: "{{ .Values.server.port }}"
         dapr.io/enabled: "true"
       labels:
@@ -27,7 +31,7 @@ spec:
       initContainers:
       - name: wait-for-auth-server
         image: busybox
-        command: ['sh', '-c', 'until nc -z auth-server 80;do sleep 1 ;done;']
+        command: ['sh', '-c', 'until nc -z auth-service 80;do sleep 1 ;done;']
       containers:
         - name: {{ .Values.server.name }}
           {{- if .Values.image.tag }}

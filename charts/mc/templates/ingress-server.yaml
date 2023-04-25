@@ -24,10 +24,18 @@ spec:
   {{- end }}
   tls:
     - hosts: 
+      {{- if .Values.global.suffix_identity }}
+      - {{ .Values.server.name }}-{{.Values.global.suffix_identity}}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+      {{- else }}
       - {{ .Values.server.name }}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+      {{- end  }}
       secretName: {{ .Values.global.secretName }}
   rules:
+    {{- if .Values.global.suffix_identity }}
+    - host: {{ .Values.server.name }}-{{.Values.global.suffix_identity}}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+    {{- else }}
     - host: {{ .Values.server.name }}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
+    {{- end  }}
       http:
         paths:
           - path: /
