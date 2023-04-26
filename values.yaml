@@ -5,7 +5,7 @@
 global:
   # 针对开发环境使用的变量进行数据库区分使用 { dev  staging  demo  production }
   suffix_identity: ""
-  demo: true
+  demo: false
   secretName: "masastack"
   domain: "masastack.com"
   image:
