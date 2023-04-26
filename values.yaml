@@ -6,7 +6,7 @@ global:
   # 针对开发环境使用的变量进行数据库区分使用 { dev  staging  demo  production }
   suffix_identity: ""
   demo: false
-  secretName: "masastack"
+  secretName: ""
   domain: "masastack.com"
   image:
     repository: registry.cn-hangzhou.aliyuncs.com/masastack
@@ -17,7 +17,7 @@ global:
 
 
   ingress:
-    secretName: "masastack"
+    secretName: ""
 
   sqlserver:
     ip: ""

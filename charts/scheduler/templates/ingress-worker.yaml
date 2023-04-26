@@ -29,7 +29,13 @@ spec:
       {{- else }}
       - {{ .Values.worker.name }}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
       {{- end  }}
-      secretName: {{ .Values.global.secretName }}
+      {{- if .Values.ingress.secretName }}
+      secretName: {{ .Values.ingress.secretName }}
+      {{- else if }}
+      secretName: {{ .Values.global.ingress.secretName }}
+      {{- else }}
+      secretName: "masastack"
+      {{- end }}
   rules:
     {{- if .Values.global.suffix_identity }}
     - host: {{ .Values.worker.name }}-{{.Values.global.suffix_identity}}{{- if  eq .Values.global.demo true -}}-demo{{ end}}.{{ .Values.global.domain}}
