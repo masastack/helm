@@ -18,7 +18,7 @@ server:
   type: ClusterIP
 
 ui:
-  name: pm-ui
+  name: pm
   replicas: 1
   port: 443 
   nodeport: ""

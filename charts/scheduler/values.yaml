@@ -25,7 +25,7 @@ worker:
   type: ClusterIP
 
 ui:
-  name: scheduler-ui
+  name: scheduler
   replicas: 1
   port: 443 
   nodeport: ""
