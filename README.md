@@ -16,6 +16,18 @@
 
 * 安装Dapr
 
+*先决条件部署参考地址*
+
+* [Installation Guide - NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/)
+
+* [Installing Helm](https://helm.sh/zh/docs/intro/install/)
+
+* [Install Tools | Kubernetes](https://kubernetes.io/docs/tasks/tools/)
+
+* [Installing Kubernetes with deployment tools | Kubernetes](https://kubernetes.io/docs/setup/production-environment/tools/)
+
+* [Deploy Dapr on a Kubernetes cluster | Dapr Docs](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/)
+
 # 使用Helm安装
 
 您可以使用Helm3 chart在kubernetes上部署MasaStack
@@ -64,15 +76,17 @@ helm upgrade --install masastack masastack/masastack --version 1.0.0-rc1 --names
 
 * 使用自签证书
 
-`参考链接`：[生成临时的tls证书提供给ingress使用 | helm](https://masastack.github.io/helm/README_TLS)
+`参考链接`：[生成临时的tls证书提供给ingress使用 ](https://masastack.github.io/helm/README_TLS)
 
-> kubectl create secret tls <tls_name> --cert=./tls.crt --key=./tls.key -n masastack
+> kubectl create secret tls <tls_name> --cert=<cert_file_path> --key=<key_file_path>  -n masastack 
 > 
 > helm upgrade --install masastack masastack/masastack --namespace  masastack  --create-namespace  --set global.secretName <tls_name> --set global.domain <domain_name>
 
-*注这里的domain_name为你自签证书中的<Common Name>*
+*注1: <domain_name>为自签证书中的<Common Name>*
 
-* 其他更多的变量参考values.yaml文件
+*注2:<tls_name>为自定义的secret名称k8s集群内部调用需要指定*
+
+*注3:<cert_file_path>,<key_file_path>主要是自签或者自有安全的通用证书所在的位置，通过手动的方式来添加到部署集群里面来*
 
 #### 常用变量
 
@@ -86,3 +100,5 @@ helm upgrade --install masastack masastack/masastack --version 1.0.0-rc1 --names
 | global.volumeclaims.{enabled,storageSize,storageClassName}            | 分别是启动StorageClass存储，指定存储空间大小，指定相应的StorageClass，若无指定使用默认sc |
 | middleware-{redis,prometheus,sqlserver,otel,elastic}.service.type     | ClusterIP,NodePort，默认为ClusterIP，主要为服务提供外部方位时修改            |
 | middleware-{redis,prometheus,sqlserver,otel,elastic}.service.nodePort | 例如，32200 ；结合type使用，指定需要的端口                                |
+
+其他更多的变量参考values.yaml文件
