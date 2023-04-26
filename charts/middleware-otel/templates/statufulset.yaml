@@ -1,0 +1,60 @@
+{{- if eq .Values.global.otel.ip  "" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middleware-otel
+  labels:
+    app: middleware-otel
+    {{- include "middleware-otel.labels" . | nindent 4 }}
+spec:
+  serviceName: middleware-otel
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: middleware-otel
+  template:
+    metadata:
+      annotations:
+        prometheus.io/path: /metrics
+        prometheus.io/port: "9013"
+        prometheus.io/scheme: http
+        prometheus.io/scrape: otel
+      labels:
+        app: middleware-otel
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: middleware-otel
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        command: 
+          - "/otelcol-contrib"
+          - "--config=/conf/otel-config.yml"
+        ports:
+        - containerPort: 55679 # Default endpoint for ZPages.
+        - containerPort: 4317 # Default endpoint for OpenTelemetry receiver.
+        - containerPort: 14250 # Default endpoint for Jaeger gRPC receiver.
+        - containerPort: 14268 # Default endpoint for Jaeger HTTP receiver.
+        - containerPort: 9411 # Default endpoint for Zipkin receiver.
+        - containerPort: 8888  # Default endpoint for querying metrics.
+        - containerPort: 9013
+          name: otel
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        volumeMounts:
+        - name: otel-config
+          mountPath: /conf/otel-config.yml
+          subPath: otel-config.yml
+      volumes:
+      - name: otel-config
+        configMap:
+          name: otel-config
+      # volumes:
+      #   - configMap:
+      #       name: otel-collector-conf
+      #       items:
+      #         - key: otel-collector-config
+      #           path: otel-collector-config.yaml
+      #     name: otel-collector-config-vol
+{{- end }}

@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  dcc-config-secret: bWFzYXN0YWNrLmNvbQ==
+kind: Secret
+metadata:
+  name: dcc-config
+

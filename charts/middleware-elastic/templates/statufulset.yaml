@@ -1,0 +1,70 @@
+{{- if eq .Values.global.elastic.ip  "" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middleware-elastic
+  labels:
+    app: middleware-elastic
+    {{- include "middleware-elastic.labels" . | nindent 4 }}
+spec:
+  serviceName: middleware-elastic
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: middleware-elastic
+  template:
+    metadata:
+      labels:
+        app: middleware-elastic
+    spec:
+      terminationGracePeriodSeconds: 10
+      initContainers:
+      - name: init-sysctl
+        image: busybox
+        command:
+        - sysctl
+        - -w
+        - vm.max_map_count=262144
+        securityContext:
+          privileged: true
+      containers:
+      - name: middleware-elastic
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        ports:
+        - containerPort: 9200
+        - containerPort: 9300
+          name: elastic
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+        - name: ES_JAVA_OPTS
+          value: -Xms512m -Xmx512m
+        volumeMounts:
+        - name: elastic-config
+          mountPath: /usr/share/elasticsearch/config/elasticsearch.yml
+          subPath: elasticsearch.yml
+{{- if eq .Values.global.volumeclaims.enabled true }}
+        - name: elasticdata
+          mountPath: /usr/share/elasticsearch/data/
+{{- end }}
+      volumes:
+      - name: elastic-config
+        configMap:
+          name: elastic-config
+{{- if eq .Values.global.volumeclaims.enabled true }}
+  volumeClaimTemplates:
+  - metadata:
+      name: elasticdata
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: {{ .Values.global.volumeclaims.storageSize }}
+    {{- if .Values.global.volumeclaims.storageClassName }}
+      storageClassName: {{ .Values.global.volumeclaims.storageClassName }}
+    {{- end }}
+{{- end }}
+{{- end }}

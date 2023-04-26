@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.sso.name }}
+  labels:
+    app: {{ .Values.sso.name }}
+    {{- include "auth.labels" . | nindent 4 }}
+spec:
+  # {{- if not .Values.autoscaling.enabled }}
+  # replicas: {{ .Values.replicaCount }}
+  # {{- end }}
+  replicas: {{ .Values.sso.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.sso.name }}
+      {{- include "auth.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.global.suffix_identity }}
+        dapr.io/app-id: {{ .Values.sso.name }}-{{ .Values.global.suffix_identity }}
+        {{- else }}
+        dapr.io/app-id: {{ .Values.sso.name }}
+        {{- end }}
+        dapr.io/app-port: "{{ .Values.sso.port }}"
+        dapr.io/enabled: "true"
+      labels:
+        app: {{ .Values.sso.name }}
+        {{- include "auth.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - name: wait-for-auth-server
+        image: busybox
+        command: ['sh', '-c', 'until nc -z auth-service 80;do sleep 1 ;done;']
+      containers:
+        - name: {{ .Values.sso.name }}
+          {{- if .Values.image.tag }}
+          image: "{{ .Values.image.repository }}/masa-auth-web-sso:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}/masa-auth-web-sso:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.sso.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 60
+            tcpSocket:
+              port: {{ .Values.sso.port }}
+          readinessProbe:
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 10
+            tcpSocket:
+              port: {{ .Values.sso.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /etc/localtime
+            name: date-config
+          - mountPath: /app/appsettings.json
+            name: {{ .Values.sso.name }}
+            subPath: appsettings.json
+          - mountPath: /app/ssl
+            name: {{ .Values.sso.name }}-secert
+            readOnly: true
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: File
+        name: date-config
+      - configMap:
+          name: {{ .Values.sso.name }}
+          items:
+          - key: appsettings.json
+            path: appsettings.json
+        name: {{ .Values.sso.name }}
+      - name: {{ .Values.sso.name }}-secert
+        secret:
+          {{- if .Values.ingress.secretName }}
+          secretName: {{ .Values.ingress.secretName }}
+          {{- else }}
+          secretName: {{ .Values.global.ingress.secretName }}
+          {{- end }}

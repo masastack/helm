@@ -1,0 +1,18 @@
+{{- if eq .Values.global.elastic.ip  "" -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: elastic-config
+data:
+  elasticsearch.yml: |
+    cluster.name: my-cluster
+    node.name: node-1
+    node.max_local_storage_nodes: 3
+    network.host: 0.0.0.0
+    http.port: 9200
+    discovery.seed_hosts: ["127.0.0.1", "[::1]"]
+    cluster.initial_master_nodes: ["node-1"]
+    http.cors.enabled: true
+    http.cors.allow-origin: /.*/
+    indices.fielddata.cache.size:  20% 
+{{- end }}

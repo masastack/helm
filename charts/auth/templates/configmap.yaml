@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.server.name }}
+data:
+  appsettings.json: |
+    {
+      "DBName": "{{ .Values.dbName }}",
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.ui.name }}
+data:
+  appsettings.json: |
+    {
+      "DBName": "{{ .Values.dbName }}",
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.sso.name }}
+data:
+  appsettings.json: |
+    {
+      "DBName": "{{ .Values.dbName }}",
+    }

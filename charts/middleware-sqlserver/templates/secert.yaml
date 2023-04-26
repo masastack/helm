@@ -1,0 +1,9 @@
+{{- if eq .Values.global.sqlserver.ip  "" -}}
+apiVersion: v1
+data:
+  MSSQL_SA_PASSWORD: {{ .Values.global.sqlserver.password | b64enc}}
+kind: Secret
+metadata:
+  name: middleware-sqlserver
+type: Opaque
+{{- end }}

@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.server.name }}
+  labels:
+    app: {{ .Values.server.name }}
+    {{- include "dcc.labels" . | nindent 4 }}
+spec:
+  # {{- if not .Values.autoscaling.enabled }}
+  # replicas: {{ .Values.replicaCount }}
+  # {{- end }}
+  replicas: {{ .Values.server.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.server.name }}
+      {{- include "dcc.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        {{- if .Values.global.suffix_identity }}
+        dapr.io/app-id: {{ .Values.server.name }}-{{ .Values.global.suffix_identity }}
+        {{- else }}
+        dapr.io/app-id: {{ .Values.server.name }}
+        {{- end }}
+        dapr.io/app-port: "{{ .Values.server.port }}"
+        dapr.io/enabled: "true"
+      labels:
+        app: {{ .Values.server.name }}
+        {{- include "dcc.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+      - name: wait-for-pm-service
+        image: busybox
+        command: ['sh', '-c', 'until nc -z pm-service 80;do sleep 1 ;done;']
+      containers:
+        - name: {{ .Values.server.name }}
+          {{- if .Values.image.tag }}
+          image: "{{ .Values.image.repository }}/masa-dcc-service-admin:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          {{- else }}
+          image: "{{ .Values.image.repository }}/masa-dcc-service-admin:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          {{- end }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 60
+            tcpSocket:
+              port: {{ .Values.server.port }}
+          readinessProbe:
+            failureThreshold: 3
+            successThreshold: 1
+            initialDelaySeconds: 0
+            timeoutSeconds: 1
+            periodSeconds: 10
+            tcpSocket:
+              port: {{ .Values.server.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /etc/localtime
+            name: date-config
+          - mountPath: /app/appsettings.json
+            name: {{ .Values.server.name }}
+            subPath: appsettings.json
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: File
+        name: date-config
+      - configMap:
+          name: {{ .Values.server.name }}
+          items:
+          - key: appsettings.json
+            path: appsettings.json
+        name: {{ .Values.server.name }}

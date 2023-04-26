@@ -1,0 +1,76 @@
+{{- if eq .Values.global.sqlserver.ip  "" -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: middleware-sqlserver
+  labels:
+    app: middleware-sqlserver
+    {{- include "middleware-sqlserver.labels" . | nindent 4 }}
+spec:
+  serviceName: middleware-sqlserver
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: middleware-sqlserver
+  template:
+    metadata:
+      labels:
+        app: middleware-sqlserver
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: middleware-sqlserver
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        ports:
+        - containerPort: 1433
+          name: sqlserver
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+        - name: MSSQL_PID
+          value: "Developer"
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: middleware-sqlserver
+              key: MSSQL_SA_PASSWORD
+        livenessProbe:
+          failureThreshold: 3
+          successThreshold: 1
+          initialDelaySeconds: 0
+          timeoutSeconds: 1
+          periodSeconds: 60
+          tcpSocket:
+            port: 1433
+        readinessProbe:
+          failureThreshold: 3
+          successThreshold: 1
+          initialDelaySeconds: 0
+          timeoutSeconds: 1
+          periodSeconds: 10
+          tcpSocket:
+            port: 1433
+        {{- if eq .Values.global.volumeclaims.enabled true }}
+        volumeMounts:
+        - name: sqldata
+          mountPath: /var/opt/mssql
+        {{- end }}
+{{- if eq .Values.global.volumeclaims.enabled true }}
+  volumeClaimTemplates:
+  - metadata:
+      name: sqldata
+    spec:
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: {{ .Values.global.volumeclaims.storageSize }}
+    {{- if .Values.global.volumeclaims.storageClassName }}
+      storageClassName: {{ .Values.global.volumeclaims.storageClassName }}
+    {{- end }}
+{{- end }}
+{{- end }}
