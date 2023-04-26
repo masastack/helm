@@ -43,8 +43,8 @@ data:
 
   {{- if .Values.ingress.secretName }}
   TLS_NAME: {{ .Values.ingress.secretName }}
-  {{- else if }}
-  TLS_NAME: {{ .Values.global.ingress.secretName }}
+  {{- else if .Values.global.secretName }}
+  TLS_NAME: {{ .Values.global.secretName }}
   {{- else }}
   TLS_NAME: "masastack"
   {{- end }}

@@ -31,8 +31,8 @@ spec:
       {{- end  }}
       {{- if .Values.ingress.secretName }}
       secretName: {{ .Values.ingress.secretName }}
-      {{- else if }}
-      secretName: {{ .Values.global.ingress.secretName }}
+      {{- else if .Values.global.secretName }}
+      secretName: {{ .Values.global.secretName }}
       {{- else }}
       secretName: "masastack"
       {{- end }}
