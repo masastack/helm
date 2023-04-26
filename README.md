@@ -66,7 +66,7 @@ helm upgrade --install masastack masastack/masastack --version 1.0.0-rc1 --names
 
 ## 在kubernetes上卸载MasaStack
 
-> helm uninstall masastack --namespace dapr-system
+> helm uninstall masastack --namespace  masastack 
 
 ### 更多信息
 
