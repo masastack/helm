@@ -40,7 +40,14 @@ data:
   ELASTIC: |- 
     {"Nodes": ["http://{{ .Values.global.elastic.ip }}:{{ .Values.global.elastic.port }}"],"Index": "masastack"}
 {{- end }}
-  TLS_NAME:  {{ .Values.global.ingress.secretName }}
+
+  {{- if .Values.ingress.secretName }}
+  TLS_NAME: {{ .Values.ingress.secretName }}
+  {{- else if .Values.global.secretName }}
+  TLS_NAME: {{ .Values.global.secretName }}
+  {{- else }}
+  TLS_NAME: "masastack"
+  {{- end }}
   {{- if eq .Values.global.demo true }}
   IS_DEMO: "true"
   {{- else }}

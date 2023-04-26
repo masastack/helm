@@ -29,7 +29,7 @@ spec:
         {{- include "pm.selectorLabels" . | nindent 8 }}
     spec:
       initContainers:
-      - name: wait-for-auth-sso
+      - name: wait-for-middleware-sqlserver
         image: busybox
         command: ['sh', '-c', 'until nc -z middleware-sqlserver 1433;do sleep 1 ;done;']
       containers:

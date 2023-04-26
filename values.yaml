@@ -5,8 +5,8 @@
 global:
   # 针对开发环境使用的变量进行数据库区分使用 { dev  staging  demo  production }
   suffix_identity: ""
-  demo: true
-  secretName: "masastack"
+  demo: false
+  secretName: ""
   domain: "masastack.com"
   image:
     repository: registry.cn-hangzhou.aliyuncs.com/masastack
@@ -17,7 +17,7 @@ global:
 
 
   ingress:
-    secretName: "masastack"
+    secretName: ""
 
   sqlserver:
     ip: ""
@@ -67,7 +67,7 @@ pm:
     nodeport: ""
   ui:
     replicas: 1
-    name: pm-ui
+    name: pm
     port: 443 
     nodeport: ""
 
@@ -90,7 +90,7 @@ dcc:
     nodeport: ""
   ui:
     replicas: 1
-    name: dcc-ui
+    name: dcc
     port: 443 
     nodeport: ""
 
@@ -113,7 +113,7 @@ auth:
     nodeport: ""
   ui:
     replicas: 1
-    name: auth-ui
+    name: auth
     port: 443 
     nodeport: ""
   sso:
@@ -141,7 +141,7 @@ mc:
     nodeport: ""
   ui:
     replicas: 1
-    name: mc-ui
+    name: mc
     port: 443 
     nodeport: ""
 
@@ -164,7 +164,7 @@ alert:
     nodeport: ""
   ui:
     replicas: 1
-    name: alert-ui
+    name: alert
     port: 443 
     nodeport: ""
 
@@ -187,7 +187,7 @@ tsc:
     nodeport: ""
   ui:
     replicas: 1
-    name: tsc-ui
+    name: tsc
     port: 443 
     nodeport: ""
 
@@ -215,7 +215,7 @@ scheduler:
     nodeport: ""
   ui:
     replicas: 1
-    name: scheduler-ui
+    name: scheduler
     port: 443 
     nodeport: ""
 

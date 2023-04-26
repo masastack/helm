@@ -20,7 +20,7 @@ server:
   type: ClusterIP
 
 ui:
-  name: dcc-ui
+  name: dcc
   replicas: 1
   port: 443 
   nodeport: ""

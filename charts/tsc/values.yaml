@@ -18,7 +18,7 @@ server:
   type: ClusterIP
 
 ui:
-  name: tsc-ui
+  name: tsc
   replicas: 1
   port: 443 
   nodeport: ""

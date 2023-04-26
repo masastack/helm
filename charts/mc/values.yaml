@@ -18,7 +18,7 @@ server:
   type: ClusterIP
 
 ui:
-  name: mc-ui
+  name: mc
   replicas: 1
   port: 443 
   nodeport: ""

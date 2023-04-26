@@ -20,7 +20,7 @@ server:
   type: ClusterIP
 
 ui:
-  name: auth-ui
+  name: auth
   replicas: 1
   port: 443 
   nodeport: ""
