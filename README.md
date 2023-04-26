@@ -6,6 +6,8 @@
 
 # 先决条件
 
+* Docker
+
 * kubernetes集群
 
 * 安装nginx-ingress
@@ -22,11 +24,13 @@
 
 * [Installing Helm](https://helm.sh/zh/docs/intro/install/)
 
-* [Install Tools | Kubernetes](https://kubernetes.io/docs/tasks/tools/)
+* [Install Tools  Kubernetes](https://kubernetes.io/docs/tasks/tools/)
 
-* [Installing Kubernetes with deployment tools | Kubernetes](https://kubernetes.io/docs/setup/production-environment/tools/)
+* [Installing Kubernetes with deployment tools  Kubernetes](https://kubernetes.io/docs/setup/production-environment/tools/)
 
-* [Deploy Dapr on a Kubernetes cluster | Dapr Docs](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/)
+* [Deploy Dapr on a Kubernetes cluster Dapr Docs](https://docs.dapr.io/operations/hosting/kubernetes/kubernetes-deploy/)
+
+* [Install Docker Engine on CentOS  Docker Documentation](https://docs.docker.com/engine/install/centos/)
 
 # 使用Helm安装
 
