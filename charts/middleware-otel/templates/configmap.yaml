@@ -1,4 +1,4 @@
-{{- if eq .Values.global.elastic.ip  "" -}}
+{{- if eq .Values.global.otel.ip  "" -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
