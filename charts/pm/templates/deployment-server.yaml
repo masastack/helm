@@ -31,7 +31,11 @@ spec:
       initContainers:
       - name: wait-for-middleware-sqlserver
         image: busybox
+        {{- if eq .Values.global.sqlserver.ip  "" -}}
         command: ['sh', '-c', 'until nc -z middleware-sqlserver 1433;do sleep 1 ;done;']
+        {{- else }}
+        command: ['sh', '-c', 'until nc -z {{ .Values.global.sqlserver.ip }} {{ .Values.global.sqlserver.port }};do sleep 1 ;done;']
+        {{- end }}
       containers:
         - name: {{ .Values.server.name }}
           {{- if .Values.image.tag }}
