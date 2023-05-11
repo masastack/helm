@@ -14,7 +14,7 @@ data:
   PROMETHEUS: http://middleware-prometheus:9090
   OTLP_URL: http://middleware-otel:4317
   NAMESPACE: {{ .Release.Namespace }}
-  VERSION: "1.0-Preview1"
+  VERSION: {{ .Chart.AppVersion }}
   CLUSTER: "Default"
   DCC_SECRET: "masastack.com"
   ADMIN_PWD: "admin123"

@@ -15,10 +15,6 @@ global:
     tag: "demo-1.0.0-rc1"
 
 
-
-  ingress:
-    secretName: ""
-
   sqlserver:
     ip: ""
     id: ""
@@ -253,3 +249,7 @@ middleware-elastic:
     type: ClusterIP
     port: 9200
     # nodePort: "30200"
+
+
+ingress:
+  secretName: ""
