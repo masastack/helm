@@ -15,9 +15,6 @@ global:
     tag: "demo-1.0.0-rc1"
 
 
-
-
-
   sqlserver:
     ip: ""
     id: ""
