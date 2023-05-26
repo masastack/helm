@@ -1,0 +1,197 @@
+version: '3.4'
+
+services:
+  middleware-elastic:
+    image: ${REGISTRY}/elasticsearch:7.6.2.0
+    
+  middleware-otel:
+    image: ${REGISTRY}/opentelemetry-collector-contrib:0.68.0
+
+  middleware-prometheus:
+    image: ${REGISTRY}/prometheus:v2.30.2
+
+  middleware-redis:
+    image: ${REGISTRY}/redis:5.0.8
+
+  middleware-sqlserver:
+    image: ${REGISTRY}/sqlserver:2019-latest
+
+  nginx:
+    image: nginx
+    depends_on:
+      - sso
+
+  pm-service:
+    image: ${REGISTRY}/masa-pm-service-admin:${TAG}
+    depends_on:
+      - middleware-sqlserver
+      - middleware-redis
+
+  pm-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:pm-service"
+    depends_on:
+      - pm-service
+
+  pm:
+    image: ${REGISTRY}/masa-pm-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  pm-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:pm"
+    depends_on:
+      - pm
+
+  dcc-service:
+    image: ${REGISTRY}/masa-dcc-service-admin:${TAG}
+    depends_on:
+      - pm-service-dapr
+
+  dcc-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:dcc-service"
+    depends_on:
+      - dcc-service
+
+  dcc:
+    image: ${REGISTRY}/masa-dcc-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  dcc-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:dcc"
+    depends_on:
+      - dcc
+
+  auth-service:
+    image: ${REGISTRY}/masa-auth-service-admin:${TAG}
+    depends_on:
+      - dcc-service-dapr
+
+  auth-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:auth-service"
+    depends_on:
+      - auth-service
+
+  auth:
+    image: ${REGISTRY}/masa-auth-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  auth-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:auth"
+    depends_on:
+      - auth
+
+  sso:
+    image: ${REGISTRY}/masa-auth-web-sso:${TAG}
+    depends_on:
+      - auth-service
+
+  alert-service:
+    image: ${REGISTRY}/masa-alert-service-admin:${TAG}
+    depends_on:
+      - auth-service
+
+  alert-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:alert-service"
+    depends_on:
+      - alert-service
+
+  alert:
+    image: ${REGISTRY}/masa-alert-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  alert-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:alert"
+    depends_on:
+      - alert
+
+  mc-service:
+    image: ${REGISTRY}/masa-mc-service-admin:${TAG}
+    depends_on:
+      - auth-service
+
+  mc-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:mc-service"
+    depends_on:
+      - mc-service
+
+  mc:
+    image: ${REGISTRY}/masa-mc-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  mc-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:mc"
+    depends_on:
+      - mc
+
+  tsc-service:
+    image: ${REGISTRY}/masa-tsc-service-admin:${TAG}
+    depends_on:
+      - auth-service
+      - middleware-elastic
+
+  tsc-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:tsc-service"
+    depends_on:
+      - tsc-service
+
+  tsc:
+    image: ${REGISTRY}/masa-tsc-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  tsc-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:tsc"
+    depends_on:
+      - tsc
+
+  scheduler-service:
+    image: 	${REGISTRY}/masa-scheduler-services-server:${TAG}
+    depends_on:
+      - auth-service
+
+  scheduler-service-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:scheduler-service"
+    depends_on:
+      - scheduler-service
+
+  scheduler-worker:
+    image: ${REGISTRY}/masa-scheduler-services-worker:${TAG}
+    depends_on:
+      - scheduler-service
+
+  scheduler-worker-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:scheduler-worker"
+    depends_on:
+      - scheduler-worker
+
+  scheduler:
+    image: ${REGISTRY}/masa-scheduler-web-admin:${TAG}
+    depends_on:
+      - sso
+
+  scheduler-dapr:
+    image: "daprio/daprd:1.10.6"
+    network_mode: "service:scheduler"
+    depends_on:
+      - scheduler
+
+  dapr-placement:
+    image: "daprio/dapr:1.10.6"
