@@ -1,0 +1,17 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: redis-statestore
+  namespace: default
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+  - name: redisHost
+    value: middleware-redis:6379
+  - name: redisPassword
+    value: "p@ssw0rd"
+  - name: actorStateStore
+    value: "true"
+  spec:
+    initTimeout: 10s
