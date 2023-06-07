@@ -6,6 +6,9 @@ services:
     
   middleware-otel:
     image: ${REGISTRY}/opentelemetry-collector-contrib:0.68.0
+    depends_on:
+      - middleware-elastic
+      - middleware-prometheus
 
   middleware-prometheus:
     image: ${REGISTRY}/prometheus:v2.30.2
