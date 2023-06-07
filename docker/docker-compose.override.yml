@@ -16,13 +16,13 @@ services:
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 
   middleware-otel:
-   command: 
-     - "--config=/etc/otel-collector-config.yaml"
-   volumes:
-        - ./otel/config.yaml:/etc/otel-collector-config.yaml
-   ports:
-     - "9023:9023"
-     - "4317:4317"
+    command: 
+      - "--config=/etc/otel-collector-config.yaml"
+    volumes:
+      - ./otel/config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "9023:9023"
+      - "4317:4317"
 
   middleware-prometheus:
     command:
