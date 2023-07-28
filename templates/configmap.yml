@@ -10,12 +10,12 @@ data:
   {{- else }}
   SUFFIX_IDENTITY: {{ .Values.global.suffix_identity }}
   {{- end }}
-  ENVIRONMENT: Production
+  MASA_ENVIRONMENT: Production
   PROMETHEUS: http://middleware-prometheus:9090
   OTLP_URL: http://middleware-otel:4317
-  NAMESPACE: {{ .Release.Namespace }}
-  VERSION: {{ .Chart.AppVersion }}
-  CLUSTER: "Default"
+  MASA_NAMESPACE: {{ .Release.Namespace }}
+  MASA_VERSION: {{ .Chart.AppVersion }}
+  MASA_CLUSTER: "Default"
   DCC_SECRET: "masastack.com"
   ADMIN_PWD: "admin123"
   DOMAIN_NAME: {{ .Values.global.domain }}
