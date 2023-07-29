@@ -57,7 +57,7 @@ helm search repo masastack --devel --versions
 3. 在集群的命名空间`masasatck`中安装MasaStack Charts .
 
 ```shell
-helm upgrade --install masastack masastack/masastack --version 1.0.0-rc1 --namespace masastack --create-namespace 
+helm upgrade --install masastack masastack/masastack --version 1.0.0 --namespace masastack --create-namespace 
 ```
 
 *程序启动时间和集群配置相关预计5-10分钟，镜像获取时间和本地带宽有关预计10-15分钟，总耗时15-25分钟就能完成安装*
