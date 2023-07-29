@@ -2,8 +2,18 @@ apiVersion: v1
 entries:
   masastack:
   - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2023-07-29T15:19:46.2247821+08:00"
+    description: A Helm chart for Kubernetes
+    digest: 61df637fa58d8d643b051379a0c996c9bd84e0efc2c0646ec8c77a169a960c68
+    name: masastack
+    type: application
+    urls:
+    - masastack-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
     appVersion: 1.0.0-rc2
-    created: "2023-05-17T17:45:11.1517325+08:00"
+    created: "2023-07-29T15:19:46.222111+08:00"
     description: A Helm chart for Kubernetes
     digest: 0e0f6f3152eb988622076ac837d4a5d655b7c6ce6042306d46a992de909b110e
     name: masastack
@@ -13,7 +23,7 @@ entries:
     version: 1.0.0-rc2
   - apiVersion: v2
     appVersion: 1.0.0-rc1
-    created: "2023-05-17T17:45:11.1455017+08:00"
+    created: "2023-07-29T15:19:46.2194507+08:00"
     description: A Helm chart for Kubernetes
     digest: 8d1e25bc9f9796a95adec1b130f006d502398eca332da8ed993c9124c60a8a50
     name: masastack
@@ -21,4 +31,4 @@ entries:
     urls:
     - masastack-1.0.0-rc1.tgz
     version: 1.0.0-rc1
-generated: "2023-05-17T17:45:11.1374915+08:00"
+generated: "2023-07-29T15:19:46.2167458+08:00"
