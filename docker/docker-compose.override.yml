@@ -6,37 +6,36 @@ version: '3.4'
 # but values present in the environment vars at runtime will always override those defined inside the .env file
 
 services:
+
   middleware-elastic:
     ports:
-      - '5200:9200'
-      - '5300:9300'
+      - "5200:9200"
+      - "5300:9300"
     environment:
       - discovery.type=single-node
-      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
 
   middleware-otel:
-    command:
-      - '--config=/etc/otel-collector-config.yaml'
+    command: 
+      - "--config=/etc/otel-collector-config.yaml"
     volumes:
       - ./otel/config.yaml:/etc/otel-collector-config.yaml
     ports:
-      - '9023:9023'
-      - '4317:4317'
+      - "9023:9023"
+      - "4317:4317"
 
   middleware-prometheus:
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--config.file=/etc/prometheus/prometheus.yml"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     ports:
-      - '9090:9090'
+    - "9090:9090"
 
   middleware-redis:
     # ports:
     #   - "5379:6379"
-    command: redis-server --requirepass p@ssw0rd --appendonly yes
-    volumes:
-      - ./redis/data:/data
+    command: redis-server --requirepass p@ssw0rd
 
   middleware-sqlserver:
     environment:
@@ -44,30 +43,30 @@ services:
       - MSSQL_SA_PASSWORD=p@ssw0rd
       - ACCEPT_EULA=Y
     ports:
-      - '5433:1433'
-    volumes:
-      - ./sqlserver/data:/var/opt/mssql/data
-
+      - "5433:1433"
+    # volumes:
+    #   - sqldata:/var/opt/mssql
+ 
   nginx:
     ports:
-      - '80:80'
-      - '443:443'
+      - "80:80"
+      - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./ssl:/etc/nginx/certs
 
   pm-service:
     ports:
-      - '5101:80'
+      - "5101:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   pm:
     ports:
-      - '5001:80'
-      - '5401:443'
+      - "5001:80"
+      - "5401:443"
     env_file:
-      - 'variables.env'
+      - "variables.env"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
@@ -77,360 +76,300 @@ services:
       - ASPNETCORE_URLS=http://+:80;https://+:443;
 
   pm-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'pm',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "pm",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   pm-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'pm-service',
-        '-app-port',
-        '80',
-        '-log-level',
-        'debug',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "pm-service",
+      "-app-port", "80",
+      "-log-level", "debug",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   dcc-service:
     ports:
-      - '5102:80'
+      - "5102:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   dcc:
     ports:
-      - '5002:80'
-      - '5402:443'
+      - "5002:80"
+      - "5402:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
     environment:
       - ASPNETCORE_URLS=http://+:80;https://+:443;
 
   dcc-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'dcc',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "dcc",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   dcc-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'dcc-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "dcc-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   auth-service:
     ports:
-      - '5103:80'
+      - "5103:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
     restart: on-failure
 
-  auth:
+  auth: 
     ports:
-      - '5003:80'
-      - '5403:443'
+      - "5003:80"
+      - "5403:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   sso:
     ports:
-      - '5000:443'
+      - "5000:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
     environment:
       - ASPNETCORE_URLS=https://+:443;
 
   auth-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'alert-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "alert-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   auth-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'alert',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "alert",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
-
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
+ 
   alert-service:
     ports:
-      - '5104:80'
+      - "5104:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   alert:
     ports:
-      - '5004:80'
-      - '5404:443'
+      - "5004:80"
+      - "5404:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   alert-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'alert-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "alert-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   alert-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'alert',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "alert",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   mc-service:
     ports:
-      - '5105:80'
+      - "5105:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   mc:
     ports:
-      - '5005:80'
-      - '5405:443'
+      - "5005:80"
+      - "5405:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   mc-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'mc-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "mc-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   mc-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'mc',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "mc",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   tsc:
     ports:
-      - '5006:80'
-      - '5406:443'
+      - "5006:80"
+      - "5406:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   tsc-service:
     ports:
-      - '5106:80'
+      - "5106:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   tsc-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'tsc',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "tsc",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   tsc-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'tsc-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "tsc-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
     volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   scheduler:
     ports:
-      - '5007:80'
-      - '5407:443'
+      - "5007:80"
+      - "5407:443"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
       - ./ssl:/app/ssl
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   scheduler-service:
     ports:
-      - '5107:80'
+      - "5107:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   scheduler-worker:
     ports:
-      - '5108:80'
+      - "5108:80"
     env_file:
-      - 'variables.env'
+      - "variables.env"
 
   scheduler-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'scheduler',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "scheduler",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
-    volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+    volumes: 
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   scheduler-service-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'scheduler-service',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "scheduler-service",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
-    volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+    volumes: 
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   scheduler-worker-dapr:
-    command: [
-        './daprd',
-        '-app-id',
-        'scheduler-worker',
-        '-app-port',
-        '80',
-        '-components-path',
-        '/components',
-        # "-config", "/configuration/masa-config.yaml"
+    command: ["./daprd",
+      "-app-id", "scheduler-worker",
+      "-app-port", "80",
+      "-components-path", "/components",
+      # "-config", "/configuration/masa-config.yaml"
       ]
-    volumes:
-      - './dapr/components/:/components'
-      - './dapr/configuration/:/configuration'
+    volumes: 
+      - "./dapr/components/:/components"
+      - "./dapr/configuration/:/configuration"
 
   dapr-placement:
-    command: ['./placement', '-port', '50000', '-log-level', 'debug']
+    command: ["./placement", "-port", "50000", "-log-level", "debug"]
     ports:
-      - '50000:50000'
+      - "50000:50000"
 
 volumes:
   sqldata:
-    external: false
+    external: false  
+
