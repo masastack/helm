@@ -1,0 +1,12 @@
+# 忽略开发相关的文件和目录
+.vscode/
+
+# 忽略构建相关的文件和目录
+/build/
+/dist/
+/out/
+
+# 忽略其他不需要提交的文件和目录
+.DS_Store
+/docker/redis/
+/docker/sqlserver/
