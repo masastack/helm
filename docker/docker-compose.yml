@@ -164,7 +164,7 @@ services:
       - tsc
 
   scheduler-service:
-    image: 	${REGISTRY}/masa-scheduler-services-server:${TAG}
+    image: ${REGISTRY}/masa-scheduler-services-server:${TAG}
     depends_on:
       - auth-service
 
